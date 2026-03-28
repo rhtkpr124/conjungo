@@ -11,3 +11,9 @@ Available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-desig
 /unfreeze, /gstack-upgrade.
 
 If gstack skills aren't working, run `cd .claude/skills/gstack && ./setup` to build the binary and register skills.
+
+## Karpathy Guidelines
+
+Coding behavioral guidelines derived from Andrej Karpathy's observations on LLM coding pitfalls.
+Available as /karpathy-guidelines. Core principles: think before coding, simplicity first,
+surgical changes, goal-driven execution.
