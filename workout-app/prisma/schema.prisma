@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id          String   @id @default(cuid())
+  name        String   @default("Athlete")
+  units       String   @default("lb")
+  goals       String   @default("[]")
+  preferences String   @default("{}")
+  createdAt   DateTime @default(now())
+
+  workoutSessions WorkoutSession[]
+  bodyweightEntries BodyweightEntry[]
+  contextEvents   ContextEvent[]
+  workoutTemplates WorkoutTemplate[]
+}
+
+model MovementBucket {
+  id   String @id @default(cuid())
+  name String @unique
+
+  exercises Exercise[]
+}
+
+model Exercise {
+  id                  String  @id @default(cuid())
+  canonicalName       String  @unique
+  primaryBucketId     String
+  equipmentType       String  @default("barbell")
+  comparisonMode      String  @default("weight")
+  normalizationFactor Float   @default(1.0)
+  isBodyweightRelevant Boolean @default(false)
+  notes               String?
+
+  primaryBucket    MovementBucket    @relation(fields: [primaryBucketId], references: [id])
+  aliases          ExerciseAlias[]
+  sessionExercises SessionExercise[]
+}
+
+model ExerciseAlias {
+  id         String @id @default(cuid())
+  exerciseId String
+  alias      String @unique
+
+  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+}
+
+model WorkoutSession {
+  id          String   @id @default(cuid())
+  userId      String
+  date        DateTime
+  startedAt   DateTime @default(now())
+  endedAt     DateTime?
+  sessionType String   @default("strength")
+  notes       String?
+  sleepHours  Float?
+  energyRating Int?
+  sorenessRating Int?
+  illnessFlag Boolean  @default(false)
+  tags        String   @default("[]")
+
+  user      User              @relation(fields: [userId], references: [id])
+  exercises SessionExercise[]
+
+  @@index([userId, date])
+}
+
+model SessionExercise {
+  id               String @id @default(cuid())
+  workoutSessionId String
+  exerciseId       String
+  displayNameUsed  String
+  orderIndex       Int
+  notes            String?
+
+  workoutSession WorkoutSession @relation(fields: [workoutSessionId], references: [id], onDelete: Cascade)
+  exercise       Exercise       @relation(fields: [exerciseId], references: [id])
+  sets           SetEntry[]
+
+  @@index([workoutSessionId])
+}
+
+model SetEntry {
+  id                String  @id @default(cuid())
+  sessionExerciseId String
+  setIndex          Int
+  setType           String  @default("working")
+  weight            Float?
+  reps              Int?
+  rpe               Float?
+  bodyweightAtTime  Float?
+  totalLoad         Float?
+  isPR              Boolean @default(false)
+  notes             String?
+
+  sessionExercise SessionExercise @relation(fields: [sessionExerciseId], references: [id], onDelete: Cascade)
+
+  @@index([sessionExerciseId])
+}
+
+model BodyweightEntry {
+  id     String   @id @default(cuid())
+  userId String
+  date   DateTime
+  weight Float
+  note   String?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, date])
+}
+
+model ContextEvent {
+  id     String   @id @default(cuid())
+  userId String
+  date   DateTime
+  type   String
+  value  String?
+  note   String?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, date])
+}
+
+model WorkoutTemplate {
+  id        String  @id @default(cuid())
+  userId    String
+  name      String
+  structure String  @default("{}")
+  active    Boolean @default(true)
+
+  user User @relation(fields: [userId], references: [id])
+}
