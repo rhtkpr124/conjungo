@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BottomNav } from "@/components/nav";
+import { PretextMessage } from "@/components/pretext-message";
 import { Send, Check, Edit2, X, Dumbbell, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -263,7 +264,7 @@ export default function WorkoutLogger() {
               {/* User input */}
               <div className="mb-1 flex justify-end">
                 <div className="max-w-[85%] rounded-2xl rounded-br-sm bg-[var(--primary)] px-3 py-2 text-sm text-[var(--primary-foreground)]">
-                  {entry.input}
+                  <PretextMessage text={entry.input} font="14px system-ui, -apple-system, sans-serif" lineHeight={20} />
                 </div>
               </div>
 
